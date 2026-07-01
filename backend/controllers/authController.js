@@ -9,12 +9,12 @@ const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validasi sederhana
+    // Validasi
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Semua field harus diisi" });
     }
 
-    // Cek apakah email sudah terdaftar
+    // Cek email sudah terdaftar
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -25,7 +25,7 @@ const register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Simpan ke database
+    // Simpan user
     const user = await prisma.user.create({
       data: {
         name,
@@ -45,7 +45,7 @@ const register = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error register:", error); // ← Tambahkan log untuk debugging
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
@@ -61,7 +61,6 @@ const login = async (req, res) => {
         .json({ message: "Email dan password harus diisi" });
     }
 
-    // Cari user berdasarkan email
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -70,13 +69,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Email atau password salah" });
     }
 
-    // Cocokkan password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Email atau password salah" });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name },
       process.env.JWT_SECRET,
@@ -93,7 +90,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error login:", error);
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
