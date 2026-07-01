@@ -1,0 +1,7 @@
+"# Mini Blog Platform" 
+"## Tech Stack" 
+"- Backend: Node.js + Express" 
+"- Frontend: React.js" 
+"- ORM: Prisma" 
+"- Database: MySQL" 
+"- Auth: JWT" 
