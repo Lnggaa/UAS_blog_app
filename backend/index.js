@@ -1,6 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+
+// Import routes
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -9,12 +12,13 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Routes (nanti kita isi)
-app.get('/', (req, res) => {
-    res.send('Mini Blog API is running!');
+// Routes
+app.use("/api/auth", authRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Mini Blog API is running!");
 });
 
-// Jalankan server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

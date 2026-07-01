@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  articles  Article[]
+  comments  Comment[]
+  likes     ArticleLike[]
+
+  @@map("users")
+}
+
+model Article {
+  id        Int       @id @default(autoincrement())
+  title     String
+  body      String    @db.Text
+  published Boolean   @default(false)
+  authorId  Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  likes     ArticleLike[]
+
+  @@map("articles")
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String    @db.Text
+  userId    Int
+  articleId Int
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model ArticleLike {
+  userId    Int
+  articleId Int
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+  @@map("article_likes")
+}
